@@ -1,7 +1,7 @@
-import { ENV } from "../../env";
+import { BACKEND_URL } from "../../env";
 
 export async function toggleTask(token: string, id: string) {
-  const res = await fetch(`${ENV.API_URL}/tasks/${id}/toggle`, {
+  const res = await fetch(`${BACKEND_URL.API_URL}/tasks/${id}/toggle`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}` },
   });

@@ -1,7 +1,7 @@
-import { ENV } from "../../env";
+import { BACKEND_URL } from "../../env";
 
 export async function deleteTask(token: string, id: string) {
-  const res = await fetch(`${ENV.API_URL}/tasks/${id}`, {
+  const res = await fetch(`${BACKEND_URL.API_URL}/tasks/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });

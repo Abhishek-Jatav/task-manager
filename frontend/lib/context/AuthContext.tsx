@@ -8,7 +8,7 @@ import {
   useRef,
   ReactNode,
 } from "react";
-import { ENV } from "../env";
+import { BACKEND_URL } from "../env";
 
 type Admin = {
   _id: string;
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`${ENV.API_URL}/auth/login`, {
+      const res = await fetch(`${BACKEND_URL.API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!refresh) return logout();
 
     try {
-      const res = await fetch(`${ENV.API_URL}/auth/refresh`, {
+      const res = await fetch(`${BACKEND_URL.API_URL}/auth/refresh`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken: refresh }),

@@ -1,7 +1,7 @@
-import { ENV } from "../../env";
+import { BACKEND_URL } from "../../env";
 
 export async function createTask(token: string, title: string) {
-  const res = await fetch(`${ENV.API_URL}/tasks`, {
+  const res = await fetch(`${BACKEND_URL.API_URL}/tasks`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
