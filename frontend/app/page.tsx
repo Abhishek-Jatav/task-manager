@@ -3,47 +3,56 @@
 import Image from "next/image";
 import UserInfo from "../app/components/UserInfo";
 import { useAuth } from "../lib/context/AuthContext";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const { admin } = useAuth();
+  const router = useRouter();
+
+  const goTo = (path: string) => {
+    toast.loading("Redirecting...");
+    setTimeout(() => {
+      toast.dismiss();
+      router.push(path);
+    }, 600);
+  };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-      <div className="max-w-2xl w-full">
+    <div className="flex min-h-[80vh] flex-col items-center justify-center text-center">
+      <div className="w-full max-w-2xl">
         {admin && <UserInfo />}
 
         <Image
-          className="mx-auto mb-8 dark:invert"
+          className="mx-auto mb-8 opacity-80"
           src="/next.svg"
-          alt="Next.js logo"
-          width={120}
+          alt="logo"
+          width={100}
           height={30}
           priority
         />
 
-        <h1 className="text-4xl font-bold tracking-tight text-black dark:text-white mb-4">
-          Build Something Amazing 🚀
-        </h1>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4">Task Manager 🚀</h1>
 
-        <p className="text-lg text-zinc-600 dark:text-zinc-400 mb-8">
+        <p className="text-zinc-400 mb-8 text-sm sm:text-base">
           {admin
-            ? "You're logged in. Explore your dashboard and manage everything seamlessly."
-            : "Start your journey by logging in or creating an account."}
+            ? "Manage your tasks efficiently with full control."
+            : "Organize your life. Track your tasks. Stay productive."}
         </p>
 
         {!admin && (
-          <div className="flex justify-center gap-4">
-            <a
-              href="/login"
-              className="px-6 py-3 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => goTo("/login")}
+              className="px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition">
               Get Started
-            </a>
+            </button>
 
-            <a
-              href="/register"
-              className="px-6 py-3 rounded-full border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+            <button
+              onClick={() => goTo("/register")}
+              className="px-6 py-3 rounded-lg border border-zinc-700 hover:bg-zinc-800 transition">
               Create Account
-            </a>
+            </button>
           </div>
         )}
       </div>

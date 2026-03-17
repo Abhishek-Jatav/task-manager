@@ -11,20 +11,19 @@ export default function Pagination({ page, maxPage, onPrev, onNext }: Props) {
       <button
         onClick={onPrev}
         disabled={page <= 1}
-        className="px-4 py-2 rounded-full border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition disabled:opacity-40">
+        className="px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40">
         ← Prev
       </button>
 
-      <span className="text-zinc-600 dark:text-zinc-400">
-        Page{" "}
-        <span className="font-semibold text-black dark:text-white">{page}</span>{" "}
-        / {maxPage || 1}
+      <span className="text-zinc-400">
+        Page <span className="text-white font-semibold">{page}</span> /{" "}
+        {maxPage || 1}
       </span>
 
       <button
         onClick={onNext}
         disabled={page >= maxPage}
-        className="px-4 py-2 rounded-full border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition disabled:opacity-40">
+        className="px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40">
         Next →
       </button>
     </div>

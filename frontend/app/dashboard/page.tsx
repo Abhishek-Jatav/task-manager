@@ -31,14 +31,17 @@ export default function Dashboard() {
   const [totalTasks, setTotalTasks] = useState(0);
 
   useEffect(() => {
-    if (!admin) router.push("/login");
+    if (!admin) {
+      toast.error("Please login first");
+      router.push("/login");
+    }
   }, [admin, router]);
 
   const loadTasks = async () => {
     if (!token) return;
 
-    setLoading(true);
     try {
+      setLoading(true);
       const { tasks, totalTasks } = await fetchTasks(
         token,
         page,
@@ -64,16 +67,15 @@ export default function Dashboard() {
       return;
     }
 
+    const id = toast.loading("Creating task...");
+
     try {
-      setLoading(true);
       await createTask(token, newTask);
-      toast.success("Task created 🎉");
+      toast.success("Task created 🎉", { id });
       setNewTask("");
       loadTasks();
     } catch (err: any) {
-      toast.error(err.message || "Failed to create task");
-    } finally {
-      setLoading(false);
+      toast.error(err.message || "Failed to create task", { id });
     }
   };
 
@@ -82,25 +84,25 @@ export default function Dashboard() {
   if (!admin) return null;
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-black dark:to-zinc-900">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-black dark:text-white">
-            Dashboard
-          </h2>
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+          <h2 className="text-2xl sm:text-3xl font-semibold">Dashboard</h2>
 
-          <button
+          {/* <button
             onClick={() => {
               logout();
               toast.success("Logged out");
               router.push("/");
             }}
-            className="px-5 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition">
+            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition">
             Logout
-          </button>
+          </button> */}
         </div>
 
-        <div className="bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-5 sm:p-8">
+        {/* CARD */}
+        <div className="bg-[#18181b] border border-zinc-800 rounded-xl p-5 sm:p-6 shadow-md">
           <TaskInput
             value={newTask}
             onChange={setNewTask}
@@ -108,65 +110,73 @@ export default function Dashboard() {
             loading={loading}
           />
 
+          {/* SEARCH */}
           <input
             type="text"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
+              toast("Searching...");
             }}
             placeholder="Search tasks..."
-            className="w-full rounded-xl border border-zinc-300 px-4 py-3 mb-6 focus:ring-2 focus:ring-blue-500 outline-none dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+            className="w-full mb-5 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 focus:ring-2 focus:ring-blue-500 outline-none"
           />
 
           {loading && (
-            <p className="text-center text-zinc-500 mb-4">Loading tasks...</p>
+            <p className="text-center text-zinc-400 mb-4">Loading tasks...</p>
           )}
 
-          {/* FIXED: No JSX comment inside props */}
           <TaskList
             tasks={tasks}
             editTaskId={editTaskId}
             editTaskTitle={editTaskTitle}
-            setEditTaskId={setEditTaskId}
+            setEditTaskId={(id) => {
+              setEditTaskId(id);
+              if (id) toast("Editing mode ✏️");
+            }}
             setEditTaskTitle={setEditTaskTitle}
             handleToggle={async (id) => {
               setTasks((prev) =>
-                prev.map((task) =>
-                  task.id === id ? { ...task, status: !task.status } : task,
+                prev.map((t) =>
+                  t.id === id ? { ...t, status: !t.status } : t,
                 ),
               );
 
               try {
                 await toggleTask(token!, id);
+                toast.success("Task updated");
               } catch {
-                toast.error("Failed to update task");
-
-                setTasks((prev) =>
-                  prev.map((task) =>
-                    task.id === id ? { ...task, status: !task.status } : task,
-                  ),
-                );
+                toast.error("Toggle failed");
               }
             }}
             handleUpdate={async (id) => {
+              if (!editTaskTitle.trim()) {
+                toast.error("Title cannot be empty");
+                return;
+              }
+
+              const t = toast.loading("Updating...");
+
               try {
                 await updateTask(token!, id, editTaskTitle);
-                toast.success("Task updated");
+                toast.success("Task updated", { id: t });
                 setEditTaskId(null);
                 setEditTaskTitle("");
                 loadTasks();
               } catch {
-                toast.error("Update failed");
+                toast.error("Update failed", { id: t });
               }
             }}
             handleDelete={async (id) => {
+              const t = toast.loading("Deleting...");
+
               try {
                 await deleteTask(token!, id);
-                toast.success("Task deleted");
+                toast.success("Task deleted", { id: t });
                 loadTasks();
               } catch {
-                toast.error("Delete failed");
+                toast.error("Delete failed", { id: t });
               }
             }}
           />

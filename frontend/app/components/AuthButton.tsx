@@ -14,9 +14,10 @@ export default function AuthButton({ type }: AuthButtonProps) {
 
   const handleClick = () => {
     if (admin) {
-      toast("Already logged in", { icon: "ℹ️" });
+      toast("Already logged in");
       router.push("/dashboard");
     } else {
+      toast("Redirecting...");
       router.push(type === "login" ? "/login" : "/register");
     }
   };
@@ -24,7 +25,7 @@ export default function AuthButton({ type }: AuthButtonProps) {
   return (
     <button
       onClick={handleClick}
-      className="rounded-full px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 transition shadow-md">
+      className="px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition text-sm">
       {type === "login" ? "Login" : "Register"}
     </button>
   );

@@ -13,6 +13,11 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const goToLogin = () => {
+    toast("Redirecting to login...");
+    router.push("/login");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -21,6 +26,7 @@ export default function RegisterPage() {
       return;
     }
 
+    const toastId = toast.loading("Creating account...");
     setLoading(true);
 
     try {
@@ -32,100 +38,66 @@ export default function RegisterPage() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        if (data.message === "User already exists") {
-          toast("User already exists. Redirecting...", { icon: "ℹ️" });
-          setTimeout(() => router.push("/login"), 2000);
-          return;
-        }
-        throw new Error(data.message || "Registration failed");
-      }
+      if (!res.ok) throw new Error(data.message);
 
-      toast.success("Account created 🎉");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-
-      setTimeout(() => router.push("/login"), 1500);
+      toast.success("Account created 🎉", { id: toastId });
+      router.push("/login");
     } catch (err: any) {
-      toast.error(err.message || "Registration failed");
+      toast.error(err.message || "Registration failed", { id: toastId });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-black dark:to-zinc-900">
-      <div className="w-full max-w-md">
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-2xl bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 shadow-xl p-8">
-          <h2 className="text-3xl font-semibold text-center text-black dark:text-white mb-2">
-            Create Account
-          </h2>
-          <p className="text-center text-zinc-500 mb-6">
-            Start your journey with us 🚀
-          </p>
+    <div className="flex min-h-[80vh] items-center justify-center">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md p-6 sm:p-8 rounded-xl bg-[#18181b] border border-zinc-800 shadow-lg">
+        <h2 className="text-2xl font-semibold text-center mb-6">Register</h2>
 
-          <div className="mb-4">
-            <label className="text-sm text-zinc-600 dark:text-zinc-400">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2 focus:ring-2 focus:ring-green-500 outline-none dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
-              placeholder="you@example.com"
-            />
-          </div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full mb-4 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700"
+        />
 
-          <div className="mb-4">
-            <label className="text-sm text-zinc-600 dark:text-zinc-400">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2 focus:ring-2 focus:ring-green-500 outline-none dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
-              placeholder="••••••••"
-            />
-          </div>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full mb-4 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700"
+        />
 
-          <div className="mb-6">
-            <label className="text-sm text-zinc-600 dark:text-zinc-400">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2 focus:ring-2 focus:ring-green-500 outline-none dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
-              placeholder="••••••••"
-            />
-          </div>
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          className="w-full mb-6 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700"
+        />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 py-2.5 text-white font-medium hover:opacity-90 transition disabled:opacity-50">
-            {loading ? "Creating account..." : "Register"}
-          </button>
+        <button
+          disabled={loading}
+          className="w-full py-2 rounded-lg bg-green-600 hover:bg-green-700 transition">
+          {loading ? "Creating..." : "Register"}
+        </button>
 
-          <p className="text-center text-sm text-zinc-500 mt-6">
-            Already have an account?{" "}
-            <span
-              onClick={() => router.push("/login")}
-              className="text-green-600 cursor-pointer hover:underline">
-              Login
-            </span>
-          </p>
-        </form>
-      </div>
+        <p className="text-center text-sm text-zinc-400 mt-6">
+          Already have an account?{" "}
+          <span
+            onClick={goToLogin}
+            className="text-green-500 cursor-pointer hover:underline">
+            Login
+          </span>
+        </p>
+      </form>
     </div>
   );
 }
