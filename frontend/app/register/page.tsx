@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ENV } from "../../lib/env";
+import { BACKEND_URL } from "../../lib/env";
 import toast from "react-hot-toast";
 
 export default function RegisterPage() {
@@ -30,7 +30,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${ENV.API_URL}/auth/register`, {
+      const res = await fetch(`${BACKEND_URL.API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
