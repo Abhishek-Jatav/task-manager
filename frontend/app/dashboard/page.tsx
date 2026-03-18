@@ -15,9 +15,10 @@ import { updateTask } from "../../lib/api/tasks/updateTask";
 import TaskInput from "../components/tasks/TaskInput";
 import TaskList from "../components/tasks/TaskList";
 import Pagination from "../components/tasks/Pagination";
+import Loader from "../components/tasks/Loader"; // ✅ added
 
 export default function Dashboard() {
-  const { admin, token, logout } = useAuth();
+  const { admin, token } = useAuth();
   const router = useRouter();
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -89,16 +90,6 @@ export default function Dashboard() {
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
           <h2 className="text-2xl sm:text-3xl font-semibold">Dashboard</h2>
-
-          {/* <button
-            onClick={() => {
-              logout();
-              toast.success("Logged out");
-              router.push("/");
-            }}
-            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition">
-            Logout
-          </button> */}
         </div>
 
         {/* CARD */}
@@ -123,70 +114,74 @@ export default function Dashboard() {
             className="w-full mb-5 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 focus:ring-2 focus:ring-blue-500 outline-none"
           />
 
-          {loading && (
-            <p className="text-center text-zinc-400 mb-4">Loading tasks...</p>
+          {/* ✅ LOADER OR TASK LIST */}
+          {loading ? (
+            <Loader />
+          ) : (
+            <TaskList
+              tasks={tasks}
+              editTaskId={editTaskId}
+              editTaskTitle={editTaskTitle}
+              setEditTaskId={(id) => {
+                setEditTaskId(id);
+                if (id) toast("Editing mode ✏️");
+              }}
+              setEditTaskTitle={setEditTaskTitle}
+              handleToggle={async (id) => {
+                setTasks((prev) =>
+                  prev.map((t) =>
+                    t.id === id ? { ...t, status: !t.status } : t,
+                  ),
+                );
+
+                try {
+                  await toggleTask(token!, id);
+                  toast.success("Task updated");
+                } catch {
+                  toast.error("Toggle failed");
+                }
+              }}
+              handleUpdate={async (id) => {
+                if (!editTaskTitle.trim()) {
+                  toast.error("Title cannot be empty");
+                  return;
+                }
+
+                const t = toast.loading("Updating...");
+
+                try {
+                  await updateTask(token!, id, editTaskTitle);
+                  toast.success("Task updated", { id: t });
+                  setEditTaskId(null);
+                  setEditTaskTitle("");
+                  loadTasks();
+                } catch {
+                  toast.error("Update failed", { id: t });
+                }
+              }}
+              handleDelete={async (id) => {
+                const t = toast.loading("Deleting...");
+
+                try {
+                  await deleteTask(token!, id);
+                  toast.success("Task deleted", { id: t });
+                  loadTasks();
+                } catch {
+                  toast.error("Delete failed", { id: t });
+                }
+              }}
+            />
           )}
 
-          <TaskList
-            tasks={tasks}
-            editTaskId={editTaskId}
-            editTaskTitle={editTaskTitle}
-            setEditTaskId={(id) => {
-              setEditTaskId(id);
-              if (id) toast("Editing mode ✏️");
-            }}
-            setEditTaskTitle={setEditTaskTitle}
-            handleToggle={async (id) => {
-              setTasks((prev) =>
-                prev.map((t) =>
-                  t.id === id ? { ...t, status: !t.status } : t,
-                ),
-              );
-
-              try {
-                await toggleTask(token!, id);
-                toast.success("Task updated");
-              } catch {
-                toast.error("Toggle failed");
-              }
-            }}
-            handleUpdate={async (id) => {
-              if (!editTaskTitle.trim()) {
-                toast.error("Title cannot be empty");
-                return;
-              }
-
-              const t = toast.loading("Updating...");
-
-              try {
-                await updateTask(token!, id, editTaskTitle);
-                toast.success("Task updated", { id: t });
-                setEditTaskId(null);
-                setEditTaskTitle("");
-                loadTasks();
-              } catch {
-                toast.error("Update failed", { id: t });
-              }
-            }}
-            handleDelete={async (id) => {
-              const t = toast.loading("Deleting...");
-
-              try {
-                await deleteTask(token!, id);
-                toast.success("Task deleted", { id: t });
-                loadTasks();
-              } catch {
-                toast.error("Delete failed", { id: t });
-              }
-            }}
-          />
-
-          <Pagination
-            page={page}
-            maxPage={maxPage}
-            onPrev={() => setPage((p) => Math.max(1, p - 1))}
-            onNext={() => setPage((p) => Math.min(maxPage, p + 1))}
-          />
+          {/* PAGINATION */}
+          {!loading && (
+            <Pagination
+              page={page}
+              maxPage={maxPage}
+              onPrev={() => setPage((p) => Math.max(1, p - 1))}
+              onNext={() => setPage((p) => Math.min(maxPage, p + 1))}
+            />
+          )}
         </div>
       </div>
     </div>

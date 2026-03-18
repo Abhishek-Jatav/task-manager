@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ReactionTestGame from "./game/reactionTest/reactionTestGame";
+import { ThemeProvider } from "next-themes";
 
 export default function Connecting({ error }: { error: string | null }) {
   const [dots, setDots] = useState("");
@@ -30,9 +31,13 @@ export default function Connecting({ error }: { error: string | null }) {
         {error && <div className="text-red-400 text-[10px] mt-1">{error}</div>}
       </div>
 
-      {/* Mini Game While Waiting */}
+      {/* Mini Game While Waiting (FORCED LIGHT THEME) */}
       <div className="flex justify-center items-center min-h-screen">
-        <ReactionTestGame />
+        <ThemeProvider forcedTheme="light">
+          <div className="bg-white text-black rounded-xl shadow-xl p-4">
+            <ReactionTestGame />
+          </div>
+        </ThemeProvider>
       </div>
     </div>
   );
