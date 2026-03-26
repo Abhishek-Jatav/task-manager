@@ -5,7 +5,7 @@ import ReactionTestGame from "./game/reactionTest/reactionTestGame";
 
 export default function Connecting({ error }: { error: string | null }) {
   const [dots, setDots] = useState<string>("");
-  const [timeLeft, setTimeLeft] = useState<number>(50);
+  const [timeLeft, setTimeLeft] = useState<number>(60);
 
   // Dots animation
   useEffect(() => {
